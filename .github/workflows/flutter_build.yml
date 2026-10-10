@@ -1,0 +1,44 @@
+name: Flutter Build CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Set up Flutter environment
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      # Get project dependencies
+      - name: Get dependencies
+        run: flutter pub get
+
+      # Generate launcher icons
+      - name: Generate Launcher Icons
+        run: flutter pub run flutter_launcher_icons
+
+      # Build the release APK
+      - name: Build APK
+        run: flutter build apk --release
+
+      # Upload the generated APK artifact
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
